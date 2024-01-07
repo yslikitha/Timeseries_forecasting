@@ -4,7 +4,7 @@ from statsmodels.tsa.api import SimpleExpSmoothing
 import matplotlib.pyplot as plt
 import math
 from sklearn.metrics import mean_squared_error
-import csv
+from sklearn.preprocessing import MinMaxScaler
 
 # load the data
 data = pd.read_csv('traffic_volume2.csv')
@@ -12,6 +12,10 @@ data1 = pd.read_csv('traffic_volume4.csv')
 
 dates = pd.date_range(start='1/1/2018', periods=len(data), freq='MS')
 
+# Scale the data using Min-Max Scaling
+scaler = MinMaxScaler()
+data['volume'] = scaler.fit_transform(data['volume'].values.reshape(-1, 1)).flatten()
+data1['volume'] = scaler.transform(data1['volume'].values.reshape(-1, 1)).flatten()
 
 # create a SimpleExpSmoothing object with alpha value 0.3 and fit the model
 model = SimpleExpSmoothing(data['volume'])
@@ -42,6 +46,6 @@ plt.plot(forecast_dates, forecast, label='forecasted values')
 plt.plot(forecast_dates1, forecast1, label='forecasted values_testing')
 plt.title('Traffic Volume Forecast using Simple Exponential Smoothing')
 plt.xlabel('Date')
-plt.ylabel('Volume')
+plt.ylabel('Scaled Volume')
 plt.legend()
 plt.show()
